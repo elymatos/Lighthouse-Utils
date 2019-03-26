@@ -7,6 +7,7 @@ use DeInternetJongens\LighthouseUtils\Schema\Scalars\Date;
 use DeInternetJongens\LighthouseUtils\Schema\Scalars\DateTimeTz;
 use DeInternetJongens\LighthouseUtils\Schema\Scalars\Email;
 use DeInternetJongens\LighthouseUtils\Schema\Scalars\FullTextSearch;
+use DeInternetJongens\LighthouseUtils\Schema\Scalars\Any;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\FloatType;
 use GraphQL\Type\Definition\IDType;
@@ -29,6 +30,7 @@ class PaginateAllQueryGenerator
         //EnumType::class,
         Email::class,
         FullTextSearch::class,
+        Any::class,
     ];
 
     /**
@@ -48,14 +50,15 @@ class PaginateAllQueryGenerator
             $className = get_class($field);
 
             // We can generate queries for all but Object types, as Object types are relations
-            if (! in_array($className, self::$supportedGraphQLTypes)) {
+            if (!in_array($className, self::$supportedGraphQLTypes)) {
                 continue;
             }
 
             $columnDataType = $field->name;
-            $inputTypeName = $inputTypeNames[$columnDataType] ?: false;
+            //$inputTypeName = $inputTypeNames[$columnDataType] ?: false;
+            $inputTypeName = $inputTypeNames['Any'] ?: false;
 
-            if (! $inputTypeName) {
+            if (!$inputTypeName) {
                 continue;
             }
 
@@ -118,7 +121,7 @@ class PaginateAllQueryGenerator
             GraphQLSchema::register($paginatedQueryName, $typeName, 'query', $paginatePermission ?? null);
         }
 
-        return $allQuery ."\r\n". $paginatedQuery;
+        return $allQuery . "\r\n" . $paginatedQuery;
     }
 
     /**
@@ -127,6 +130,7 @@ class PaginateAllQueryGenerator
     public static function getInputTypes(): array
     {
         $inputTypeNames = self::getInputTypeNamesKeyedByDataType();
+        $scalarNames = self::getScalarNamesByDataType();
         /*
         $inputTypes = [
             'enum Operator {
@@ -139,12 +143,27 @@ class PaginateAllQueryGenerator
         */
         $inputTypes = [
             'enum Operator {
-                MORETHAN @enum(value: ">")
-                LESSTHAN @enum(value: "<")
-                EQUALS @enum(value: "=")
-                NOTEQUALS @enum(value: "!=")
+                EQ @enum(value: "eq")
+                NEQ @enum(value: "neq")
+                GT @enum(value: "gt")
+                GTE @enum(value: "gte")
+                LT @enum(value: "lt")
+                LTE @enum(value: "lte")
+                IN @enum(value: "in")
+                NOT_IN @enum(value: "notIn")
+                CONTAINS @enum(value: "contains")
+                NOT_CONTAINS @enum(value: "not_contains")
+                STARTS_WITH @enum(value: "starts_with")
+                NOT_STARTS_WITH @enum(value: "not_starts_with")
+                ENDS_WITH @enum(value: "ends_with")
+                NOT_ENDS_WITH @enum(value: "not_ends_with")
+                FULLTEXT @enum(value: "fulltext")
             }',
         ];
+
+        foreach ($scalarNames as $dataType => $scalarClassName) {
+            $inputTypes[] = sprintf('scalar %s @scalar(class: "%s")', $dataType, $scalarClassName);
+        }
 
         foreach ($inputTypeNames as $dataType => $inputTypeName) {
             $inputTypes[] = sprintf('input %s {operator: Operator! value: %s!}', $inputTypeName, $dataType);
@@ -167,4 +186,19 @@ class PaginateAllQueryGenerator
         return $names;
     }
 
+    /**
+     * @return array
+     */
+    private static function getScalarNamesByDataType(): array
+    {
+        $names = [];
+        foreach (self::$supportedGraphQLTypes as $supportedGraphQLType) {
+            $columnDataType = (new $supportedGraphQLType())->name;
+            if (!in_array($columnDataType,['Int','String','Float','ID'])) {
+                $names[$columnDataType] = str_replace('\\','\\\\',$supportedGraphQLType);
+            }
+        }
+
+        return $names;
+    }
 }

@@ -11,7 +11,15 @@ class InFilterDirective extends BaseDirective
      */
     public function handle(string $fieldName, $value, Builder $builder): Builder
     {
-        return $builder->whereIn($fieldName, $value);
+        if(!is_array($value)) {
+            $v = [];
+            foreach ($value->getIterator() as $x) {
+                $v[] = $x->value;
+            }
+        } else {
+            $v = $value;
+        }
+        return $builder->whereIn($fieldName, $v);
     }
 
     public function name(): string

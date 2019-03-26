@@ -47,6 +47,7 @@ class GenerateSchemaCommand extends Command
         $this->call('lighthouse:clear-cache');
 
         $schemaFilePath = config('lighthouse.schema.register');
+        /*
         $this->askWithCompletion(
             sprintf(
                 'Generating schema in location: "%s", do you want to continue?',
@@ -55,7 +56,7 @@ class GenerateSchemaCommand extends Command
             ['yes', 'no'],
             'yes'
         );
-
+        */
         $schemaFilesPaths = config('lighthouse-utils.schema_paths');
         $generatedSchema = $this->schemaGenerator->generate($schemaFilesPaths);
 
