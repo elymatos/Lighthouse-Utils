@@ -169,7 +169,7 @@ class SchemaGenerator
 
                 // Webonyx GraphQL will not generate a schema if there is not at least one query
                 // So just pretend we have one
-                $placeholderQuery = 'type Query{placeholder:String}';
+                $placeholderQuery = '';//'type Query{placeholder:String}';
                 return "$relativeTypeImports\r\n$placeholderQuery";
             }
         );

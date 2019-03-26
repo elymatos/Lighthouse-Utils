@@ -127,6 +127,16 @@ class PaginateAllQueryGenerator
     public static function getInputTypes(): array
     {
         $inputTypeNames = self::getInputTypeNamesKeyedByDataType();
+        /*
+        $inputTypes = [
+            'enum Operator {
+                MORETHAN @enum(value: ">")
+                LESSTHAN @enum(value: "<")
+                EQUALS @enum(value: "=")
+                NOTEQUALS @enum(value: "!=")
+            }',
+        ];
+        */
         $inputTypes = [
             'enum Operator {
                 MORETHAN @enum(value: ">")

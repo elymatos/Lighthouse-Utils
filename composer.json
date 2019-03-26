@@ -1,5 +1,5 @@
 {
-  "name": "deinternetjongens/lighthouse-utils",
+  "name": "elymatos/lighthouse-utils",
   "description": "A Laravel Lighthouse addon with several utilities to automatically generate an awesome GraphQL API",
   "license": "MIT",
   "keywords": [
@@ -12,6 +12,10 @@
     {
       "name": "De Internet Jongens",
       "email": "support@deinternetjongens.nl"
+    },
+    {
+      "name": "Ely Matos",
+      "email": "admin@ematos.net"
     }
   ],
   "require": {
@@ -20,7 +24,7 @@
     "illuminate/auth": "^5.4",
     "illuminate/database": "^5.4",
     "illuminate/support": "^5.4",
-    "nuwave/lighthouse": "^2.3"
+    "nuwave/lighthouse": "^2.6"
   },
   "require-dev": {
     "orchestra/testbench": "~3.6.0|~3.7.0",

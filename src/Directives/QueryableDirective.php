@@ -36,8 +36,15 @@ class QueryableDirective extends \Nuwave\Lighthouse\Schema\Directives\BaseDirect
      */
     public function handle(string $fieldName, array $arguments, Builder $builder): Builder
     {
-
-        return $builder->where($fieldName, $arguments['operator'], $arguments['value']);
+        if ($arguments['operator'] == 'IN') {
+            $v = [];
+            foreach($arguments['value']->getIterator() as $x) {
+                $v[] = $x->value;
+            }
+            return $builder->whereIn($fieldName, $v);
+        } else {
+            return $builder->where($fieldName, $arguments['operator'], $arguments['value']);
+        }
     }
 
     public function name(): string
