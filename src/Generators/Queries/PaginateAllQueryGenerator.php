@@ -33,6 +33,13 @@ class PaginateAllQueryGenerator
         Any::class,
     ];
 
+    /** @var array */
+    private static $builtinScalarType = [
+        IDType::class,
+        StringType::class,
+        IntType::class,
+        FloatType::class,
+    ];
     /**
      * Generates GraphQL queries with arguments for each field
      * Returns a query for 'all' and 'paginated', depending on what kind of result you want
@@ -55,8 +62,12 @@ class PaginateAllQueryGenerator
             }
 
             $columnDataType = $field->name;
-            //$inputTypeName = $inputTypeNames[$columnDataType] ?: false;
-            $inputTypeName = $inputTypeNames['Any'] ?: false;
+
+            if (in_array($className, self::$builtinScalarType)) {
+                $inputTypeName = $inputTypeNames['Any'] ?: false;
+            } else {
+                $inputTypeName = $inputTypeNames[$columnDataType] ?: false;
+            }
 
             if (!$inputTypeName) {
                 continue;
@@ -194,7 +205,7 @@ class PaginateAllQueryGenerator
         $names = [];
         foreach (self::$supportedGraphQLTypes as $supportedGraphQLType) {
             $columnDataType = (new $supportedGraphQLType())->name;
-            if (!in_array($columnDataType,['Int','String','Float','ID'])) {
+            if (!in_array($supportedGraphQLType, self::$builtinScalarType)) {
                 $names[$columnDataType] = str_replace('\\','\\\\',$supportedGraphQLType);
             }
         }
